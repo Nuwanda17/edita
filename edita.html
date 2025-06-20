@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Una Invitación Especial</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts (Actualizado a Playfair Display) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            /* Fuente principal actualizada a Playfair Display */
+            font-family: 'Playfair Display', serif;
+            transition: background-image 0.8s ease-in-out;
+        }
+        .font-dancing {
+            font-family: 'Dancing Script', cursive;
+        }
+        .card {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn {
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.25);
+        }
+        .page-section {
+            display: none;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        #map-preview-container, .options-grid-container {
+             animation: fadeIn 0.5s ease-in-out;
+        }
+        textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-cover bg-center bg-no-repeat min-h-screen text-white">
+
+    <!-- SECCIÓN 1: INVITACIÓN -->
+    <div id="page-invite" class="page-section flex flex-col items-center justify-center min-h-screen p-4">
+        <div class="card p-8 md:p-12 rounded-2xl shadow-2xl text-center max-w-lg w-full">
+            <h1 class="font-dancing text-5xl sm:text-6xl md:text-7xl mb-6">Dear Edita,</h1>
+            <p class="text-2xl sm:text-3xl mb-8 leading-relaxed">do you want to be my date this Saturday?</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button id="btn-yes" class="btn bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-8 rounded-full shadow-lg text-lg">Yes</button>
+                <button id="btn-no" class="btn bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-full shadow-lg text-lg">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 2: RESPUESTA "NO" -->
+    <div id="page-no" class="page-section flex flex-col items-center justify-center min-h-screen p-4">
+        <div class="card p-8 md:p-12 rounded-2xl shadow-2xl text-center max-w-md w-full">
+            <h2 class="text-3xl sm:text-4xl font-semibold mb-6">are you kidding me, right?</h2>
+            <button id="btn-kidding" class="btn bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-8 rounded-full shadow-lg text-lg">Of course!</button>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 3: ELECCIÓN DE ACTIVIDAD -->
+    <div id="page-activity-choice" class="page-section flex flex-col items-center justify-center min-h-screen p-4">
+        <div class="card p-8 md:p-12 rounded-2xl shadow-2xl text-center max-w-2xl w-full">
+            <h2 class="font-dancing text-5xl sm:text-6xl md:text-7xl mb-8">What do you want to do?</h2>
+            <!-- Opciones reordenadas -->
+            <div class="flex flex-col gap-4 w-full">
+                <button id="btn-activity-coffee" class="btn bg-yellow-800/80 hover:bg-yellow-700/80 text-white font-semibold py-3 px-4 rounded-lg text-xl">Coffee date</button>
+                <button id="btn-activity-movie" class="btn bg-blue-800/80 hover:bg-blue-700/80 text-white font-semibold py-3 px-4 rounded-lg text-xl">I want to watch a movie</button>
+                <button id="btn-activity-cuddles" class="btn bg-green-800/80 hover:bg-green-700/80 text-white font-semibold py-3 px-4 rounded-lg text-xl">I just want cuddles and matecito</button>
+                <button id="btn-activity-dinner" class="btn bg-red-800/80 hover:bg-red-700/80 text-white font-semibold py-3 px-4 rounded-lg text-xl">A fancy dinner</button>
+                <button id="btn-activity-better-idea" class="btn bg-purple-800/80 hover:bg-purple-700/80 text-white font-semibold py-3 px-4 rounded-lg text-xl">I have a better idea</button>
+            </div>
+            <div class="mt-8">
+                <button id="btn-back-to-invite" class="btn bg-gray-600 hover:bg-gray-500 text-white font-semibold py-2 px-6 rounded-full">Go Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 4: ELECCIÓN DE LUGAR -->
+    <div id="page-location-choice" class="page-section flex flex-col items-center justify-center min-h-screen p-4">
+        <div class="card p-8 md:p-12 rounded-2xl shadow-2xl text-center max-w-3xl w-full">
+            <h2 id="location-title" class="font-dancing text-5xl sm:text-6xl md:text-7xl mb-8">Pick a Place</h2>
+            <div id="map-preview-container" class="w-full hidden mb-4">
+                <iframe id="map-iframe" class="w-full h-64 md:h-80 rounded-lg border-2 border-white/30" src="" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center mt-6">
+                    <button id="btn-confirm-choice" class="btn bg-green-600 hover:bg-green-500 text-white font-bold py-3 px-6 rounded-full">¡Me encanta! Confirmar</button>
+                    <button id="btn-change-option" class="btn bg-gray-600 hover:bg-gray-500 text-white font-semibold py-3 px-6 rounded-full">Mmm... ver otras opciones</button>
+                </div>
+            </div>
+            <div id="dinner-options-grid" class="options-grid-container hidden w-full">
+                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <button data-url="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2446.975906347489!2d-54.6821603741176!3d-25.49773721417672!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94f685aaa1b60a2d%3A0x237b8eca0cbaed7a!2sBar%20San%20Miguel%20CDE!5e1!3m2!1ses!2spy!4v1750376550652!5m2!1ses!2spy" data-name="Bar San Miguel CDE" class="option-btn btn bg-teal-600 hover:bg-teal-500 text-white font-semibold py-3 px-4 rounded-lg">Option 1</button>
+                    <button data-url="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3460.2379424834844!2d-54.60995252477804!3d-25.508447377511864!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94f69b27ec7f397f%3A0x8fe3ebb573acbb0d!2sSAX%20Palace!5e1!3m2!1ses!2spy!4v1750376250712!5m2!1ses!2spy" data-name="SAX Palace" class="option-btn btn bg-teal-600 hover:bg-teal-500 text-white font-semibold py-3 px-4 rounded-lg">Option 2</button>
+                    <button data-url="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3459.863908110239!2d-54.62599992477749!3d-25.521424077503692!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94f68ff11e9182a7%3A0xc836f86e5c9114b3!2sRavello%20Ristorante!5e1!3m2!1ses!2spy!4v1750376270061!5m2!1ses!2spy" data-name="Ravello Ristorante" class="option-btn btn bg-teal-600 hover:bg-teal-500 text-white font-semibold py-3 px-4 rounded-lg">Option 3</button>
+                    <button data-url="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3461.10381126601!2d-54.62581632477897!3d-25.478383377531078!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94f6859b3d3c55f1%3A0x9465323238aad69e!2zTGEgQ2Fyb2xpbmEsIENhZsOpIEJpc3Ryw7MgJiBCYXI!5e1!3m2!1ses!2spy!4v1750376609708!5m2!1ses!2spy" data-name="La Carolina, Café Bistró & Bar" class="option-btn btn bg-teal-600 hover:bg-teal-500 text-white font-semibold py-3 px-4 rounded-lg">Option 4</button>
+                    <button data-url="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d1730.5780268323458!2d-54.6229862!3d-25.4765684!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94f68ff000000147%3A0xd76ab5f0045d58f4!2sLas%20Ventanas%20Hotel%20Boutique!5e1!3m2!1ses!2spy!4v1750376538781!5m2!1ses!2spy" data-name="Las Ventanas Hotel Boutique" class="option-btn btn bg-teal-600 hover:bg-teal-500 text-white font-semibold py-3 px-4 rounded-lg">Option 5</button>
+                    <button class="btn-location-better-idea btn bg-purple-600 hover:bg-purple-500 text-white font-semibold py-3 px-4 rounded-lg">I have a better option dear</button>
+                </div>
+            </div>
+            <div id="coffee-options-grid" class="options-grid-container hidden w-full">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <button data-url="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3459.770604618233!2d-54.631202024777366!3d-25.524660177501534!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94f68fa8e9870e6d%3A0xd73137e275f4ee98!2sDi%20Paula%20Cafeter%C3%ADa!5e1!3m2!1ses!2spy!4v1750377036722!5m2!1ses!2spy" data-name="Di Paula Cafetería" class="option-btn btn bg-teal-600 hover:bg-teal-500 text-white font-semibold py-3 px-4 rounded-lg">Option 1</button>
+                    <button data-url="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6920.341253371929!2d-54.637086324777805!3d-25.510783277510438!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94f68566fb855555%3A0x3986d6d22073ceda!2sDeux%20Coffee%20Roasters%20Arena%20Shops!5e1!3m2!1ses!2spy!4v1750377006007!5m2!1ses!2spy" data-name="Deux Coffee Roasters" class="option-btn btn bg-teal-600 hover:bg-teal-500 text-white font-semibold py-3 px-4 rounded-lg">Option 2</button>
+                    <button data-url="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3461.094916649493!2d-54.62659732477887!3d-25.478692377530873!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94f68592e3f8412f%3A0x572d46f1a7d787e5!2sClementine%20Caf%C3%A9!5e1!3m2!1ses!2spy!4v1750377309397!5m2!1ses!2spy" data-name="Clementine Café" class="option-btn btn bg-teal-600 hover:bg-teal-500 text-white font-semibold py-3 px-4 rounded-lg">Option 3</button>
+                    <button data-url="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d611.6018298412511!2d-54.62584530721654!3d-25.52563798807818!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94f68f3103bd3dd9%3A0x901e3bc7ec9aad6b!2sSaint%20Tropez%20Caf%C3%A9!5e1!3m2!1ses!2spy!4v1750377362212!5m2!1ses!2spy" data-name="Saint Tropez Café" class="option-btn btn bg-teal-600 hover:bg-teal-500 text-white font-semibold py-3 px-4 rounded-lg">Option 4</button>
+                    <button data-url="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3459.836420752621!2d-54.64285542477741!3d-25.522377477503!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94f68f006cb2c97b%3A0x60d111b4a0e041a0!2sBistrea%20Caf%C3%A9%20Atelie!5e1!3m2!1ses!2spy!4v1750377467761!5m2!1ses!2spy" data-name="Bistrea Café Atelie" class="option-btn btn bg-teal-600 hover:bg-teal-500 text-white font-semibold py-3 px-4 rounded-lg">Option 5</button>
+                    <button class="btn-location-better-idea btn bg-purple-600 hover:bg-purple-500 text-white font-semibold py-3 px-4 rounded-lg">I have a better option dear</button>
+                </div>
+            </div>
+            <div class="mt-8">
+                <button id="btn-back-to-activities" class="btn bg-gray-600 hover:bg-gray-500 text-white font-semibold py-2 px-6 rounded-full">Go Back</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- SECCIÓN 5: ELECCIÓN DE HORA (Dinámica) -->
+    <div id="page-time-choice" class="page-section flex flex-col items-center justify-center min-h-screen p-4">
+        <div class="card p-8 md:p-12 rounded-2xl shadow-2xl text-center max-w-lg w-full">
+            <h2 id="time-choice-title" class="font-dancing text-5xl sm:text-6xl md:text-7xl mb-8">Perfect! What time?</h2>
+            <div id="time-options-container" class="flex flex-col gap-4 w-full"></div>
+             <div class="mt-8">
+                <button id="btn-back-to-location" class="btn bg-gray-600 hover:bg-gray-500 text-white font-semibold py-2 px-6 rounded-full">Choose another place</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 6: CINE -->
+    <div id="page-movie" class="page-section flex flex-col items-center justify-center min-h-screen p-4">
+        <div class="card p-8 md:p-12 rounded-2xl shadow-2xl text-center max-w-lg w-full">
+            <h2 class="font-dancing text-5xl sm:text-6xl md:text-7xl mb-8">Movie Night!</h2>
+            <a href="https://api.whatsapp.com/send/?phone=%2B595973102639&text=Coraz%C3%B3n%2C%20vayamos%20a%20ver%20Elio" target="_blank" class="btn block bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-4 rounded-lg text-xl">¡Vamos a ver una peli!</a>
+            <div class="mt-8">
+                <button id="btn-back-to-activities-from-movie" class="btn bg-gray-600 hover:bg-gray-500 text-white font-semibold py-2 px-6 rounded-full">Go Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 7: MEJOR IDEA -->
+    <div id="page-better-idea" class="page-section flex flex-col items-center justify-center min-h-screen p-4">
+        <div class="card p-8 md:p-12 rounded-2xl shadow-2xl text-center max-w-lg w-full">
+            <h2 class="font-dancing text-5xl sm:text-6xl md:text-7xl mb-8">Tell me your idea!</h2>
+            <textarea id="idea-textarea" class="w-full h-32 p-3 rounded-lg bg-black/30 text-white placeholder-white/60 border border-white/30 focus:outline-none focus:ring-2 focus:ring-pink-400" placeholder="Escribe aquí tu plan..."></textarea>
+            <button id="btn-send-idea" class="btn w-full mt-4 bg-purple-600 hover:bg-purple-500 text-white font-semibold py-3 px-4 rounded-lg text-xl">Send my idea</button>
+            <div class="mt-8">
+                <button id="btn-back-to-activities-from-idea" class="btn bg-gray-600 hover:bg-gray-500 text-white font-semibold py-2 px-6 rounded-full">Go Back</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- State Variables ---
+        const bgInvite = 'https://64.media.tumblr.com/c13d610cbeec830d06c0153a7c0ab9ec/4f4d3b131ad3b4e2-8a/s1280x1920/12cdd56bdc05d2a06030f56604faa65de4eb4aae.png';
+        const bgNo = 'https://pbs.twimg.com/media/Gse_0laXYAASwGH.jpg';
+        let selectedPlaceName = '';
+        const whatsappNumber = '%2B595973102639';
+        let cameFromLocationChoice = false;
+
+        // --- DOM Elements ---
+        const body = document.body;
+        const pageInvite = document.getElementById('page-invite');
+        const pageNo = document.getElementById('page-no');
+        const pageActivityChoice = document.getElementById('page-activity-choice');
+        const pageLocationChoice = document.getElementById('page-location-choice');
+        const pageTimeChoice = document.getElementById('page-time-choice');
+        const pageMovie = document.getElementById('page-movie');
+        const pageBetterIdea = document.getElementById('page-better-idea');
+        
+        // Buttons
+        const btnYes = document.getElementById('btn-yes');
+        const btnNo = document.getElementById('btn-no');
+        const btnKidding = document.getElementById('btn-kidding');
+        const btnBackToInvite = document.getElementById('btn-back-to-invite');
+        const btnActivityDinner = document.getElementById('btn-activity-dinner');
+        const btnActivityCoffee = document.getElementById('btn-activity-coffee');
+        const btnActivityMovie = document.getElementById('btn-activity-movie');
+        const btnActivityCuddles = document.getElementById('btn-activity-cuddles');
+        const btnActivityBetterIdea = document.getElementById('btn-activity-better-idea');
+        const btnsLocationBetterIdea = document.querySelectorAll('.btn-location-better-idea');
+        const btnBackToActivities = document.getElementById('btn-back-to-activities');
+        const btnBackToLocation = document.getElementById('btn-back-to-location');
+        const btnConfirmChoice = document.getElementById('btn-confirm-choice');
+        const btnChangeOption = document.getElementById('btn-change-option');
+        const btnBackToActivitiesFromMovie = document.getElementById('btn-back-to-activities-from-movie');
+        const btnBackToActivitiesFromIdea = document.getElementById('btn-back-to-activities-from-idea');
+        const btnSendIdea = document.getElementById('btn-send-idea');
+        
+        // Content Containers
+        const dinnerOptionsGrid = document.getElementById('dinner-options-grid');
+        const coffeeOptionsGrid = document.getElementById('coffee-options-grid');
+        const mapPreviewContainer = document.getElementById('map-preview-container');
+        const mapIframe = document.getElementById('map-iframe');
+        const optionButtons = document.querySelectorAll('.option-btn');
+        const locationTitle = document.getElementById('location-title');
+        const timeChoiceTitle = document.getElementById('time-choice-title');
+        const timeOptionsContainer = document.getElementById('time-options-container');
+        const ideaTextarea = document.getElementById('idea-textarea');
+
+        // --- Functions ---
+        function showPage(pageToShow, bgImage = bgInvite) {
+            document.querySelectorAll('.page-section').forEach(page => page.style.display = 'none');
+            body.style.backgroundImage = `url('${bgImage}')`;
+            pageToShow.style.display = 'flex';
+        }
+
+        function updateTimeChoicePage(type, placeName = '') {
+            const baseUrl = `https://api.whatsapp.com/send/?phone=${whatsappNumber}&text=`;
+            let times = [];
+            let messageTemplate = '';
+
+            if (type === 'Cuddles and Matecito') {
+                btnBackToLocation.textContent = 'Go Back';
+            } else {
+                btnBackToLocation.textContent = 'Choose another place';
+            }
+
+            switch(type) {
+                case 'A Fancy Dinner':
+                    times = ['19:00 hs', '20:00 hs', '21:00 hs'];
+                    messageTemplate = `¡Hola corazón! Confirmado. Acepto la cita para una 'Fancy Dinner' a las {time} en "${placeName}"`;
+                    break;
+                case 'A Coffee Date':
+                    times = ['15:00 hs', '16:00 hs', '17:00 hs'];
+                    messageTemplate = `¡Hola corazón! Confirmado. Acepto la cita para un 'Coffee Date' a las {time} en "${placeName}"`;
+                    break;
+                case 'Cuddles and Matecito':
+                    times = ['18:00 hs', '19:00 hs', '20:00 hs'];
+                    messageTemplate = `Corazón, acepto el matecito para las {time}`;
+                    break;
+            }
+            
+            timeChoiceTitle.textContent = `Perfect! What time?`;
+            timeOptionsContainer.innerHTML = ''; 
+
+            times.forEach(time => {
+                const message = messageTemplate.replace('{time}', time);
+                const encodedMessage = encodeURIComponent(message);
+                const link = document.createElement('a');
+                link.href = baseUrl + encodedMessage;
+                link.target = '_blank';
+                link.className = 'btn block bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-4 rounded-lg text-xl';
+                link.textContent = time;
+                timeOptionsContainer.appendChild(link);
+            });
+        }
+
+        // --- Event Listeners ---
+        // Main navigation
+        btnYes.addEventListener('click', () => showPage(pageActivityChoice));
+        btnNo.addEventListener('click', () => showPage(pageNo, bgNo));
+        btnKidding.addEventListener('click', () => showPage(pageInvite));
+        
+        // Back buttons
+        btnBackToInvite.addEventListener('click', () => showPage(pageInvite));
+        btnBackToActivities.addEventListener('click', () => showPage(pageActivityChoice));
+        btnBackToActivitiesFromMovie.addEventListener('click', () => showPage(pageActivityChoice));
+        btnBackToActivitiesFromIdea.addEventListener('click', () => showPage(pageActivityChoice));
+        
+        btnBackToLocation.addEventListener('click', () => {
+            if (cameFromLocationChoice) {
+                showPage(pageLocationChoice);
+            } else {
+                showPage(pageActivityChoice);
+            }
+        });
+
+        // Activity choices
+        btnActivityDinner.addEventListener('click', () => {
+            showPage(pageLocationChoice);
+            locationTitle.textContent = 'A Fancy Dinner';
+            dinnerOptionsGrid.style.display = 'block';
+            coffeeOptionsGrid.style.display = 'none';
+            mapPreviewContainer.style.display = 'none';
+        });
+        
+        btnActivityCoffee.addEventListener('click', () => {
+            showPage(pageLocationChoice);
+            locationTitle.textContent = 'A Coffee Date';
+            coffeeOptionsGrid.style.display = 'block';
+            dinnerOptionsGrid.style.display = 'none';
+            mapPreviewContainer.style.display = 'none';
+        });
+        
+        btnActivityMovie.addEventListener('click', () => showPage(pageMovie));
+        
+        btnActivityCuddles.addEventListener('click', () => {
+            cameFromLocationChoice = false;
+            updateTimeChoicePage('Cuddles and Matecito');
+            showPage(pageTimeChoice);
+        });
+
+        btnActivityBetterIdea.addEventListener('click', () => showPage(pageBetterIdea));
+
+        btnsLocationBetterIdea.forEach(btn => {
+            btn.addEventListener('click', () => showPage(pageBetterIdea));
+        });
+
+        // Location choice logic
+        optionButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const mapUrl = button.dataset.url;
+                if (mapUrl) {
+                    selectedPlaceName = button.dataset.name; 
+                    mapIframe.src = mapUrl;
+                    dinnerOptionsGrid.style.display = 'none';
+                    coffeeOptionsGrid.style.display = 'none';
+                    mapPreviewContainer.style.display = 'block';
+                }
+            });
+        });
+
+        btnChangeOption.addEventListener('click', () => {
+            mapPreviewContainer.style.display = 'none';
+            if (locationTitle.textContent === 'A Fancy Dinner') {
+                dinnerOptionsGrid.style.display = 'block';
+            } else {
+                coffeeOptionsGrid.style.display = 'block';
+            }
+            mapIframe.src = '';
+            selectedPlaceName = '';
+        });
+        
+        btnConfirmChoice.addEventListener('click', () => {
+            const activityType = locationTitle.textContent;
+            if (activityType === 'A Fancy Dinner' || activityType === 'A Coffee Date') {
+                cameFromLocationChoice = true;
+                updateTimeChoicePage(activityType, selectedPlaceName);
+                showPage(pageTimeChoice);
+            }
+        });
+
+        // "Better Idea" logic
+        btnSendIdea.addEventListener('click', () => {
+            const idea = ideaTextarea.value;
+            if (idea.trim()) {
+                const message = `¡Hola corazón! Tengo una idea mejor para nuestra cita: ${idea}`;
+                const encodedMessage = encodeURIComponent(message);
+                window.open(`https://api.whatsapp.com/send/?phone=${whatsappNumber}&text=${encodedMessage}`, '_blank');
+            }
+        });
+
+        // Initial Load
+        window.onload = () => showPage(pageInvite);
+    </script>
+</body>
+</html>
